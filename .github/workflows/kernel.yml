@@ -39,10 +39,10 @@ jobs:
         echo "ENABLE_CCACHE=$(cat $CONFIG_ENV | grep -w "ENABLE_CCACHE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "NEED_DTBO=$(cat $CONFIG_ENV | grep -w "NEED_DTBO" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
 
-    - name: Set swap to 10G
+    - name: Set swap to 20G
       uses: pierotofy/set-swap-space@master
       with:
-        swap-size-gb: 12
+        swap-size-gb: 20
 
     - name: Setup build kernel environment
       run: |
@@ -56,8 +56,10 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
         mkdir clang-aosp
-        wget https://github.com/ZyCromerZ/Clang/releases/download/19.0.0git-20240223-release/Clang-19.0.0git-20240223.tar.gz
-        tar -C clang-aosp/ -zxvf Clang-19.0.0git-20240223.tar.gz
+        LATEST_RELEASE_INFO=$(curl -s https://api.github.com/repos/ZyCromerZ/Clang/releases/latest)
+        TARBALL_URL=$(echo "$LATEST_RELEASE_INFO" | jq -r '.assets[0].browser_download_url')
+        wget -O clang-latest.tar.gz "$TARBALL_URL"
+        tar -C clang-aosp/ -zxvf clang-latest.tar.gz
 
     - name: Download GCC-AOSP
       run: |
@@ -110,13 +112,13 @@ jobs:
       uses: hendrikmuhs/ccache-action@v1.2
       with:
         key: build-kernel-${{ env.DEVICE }}${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}
-        max-size: 2G
+        max-size: 8G
 
     - name: Build kernel
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
         export PATH=$GITHUB_WORKSPACE/kernel_workspace/clang-aosp/bin:$PATH
-        KBUILD_BUILD_USER="Aqua"
+        KBUILD_BUILD_USER="aqua"
         KBUILD_BUILD_HOST="CI"
         make -j$(nproc --all) CC=clang O=out ARCH=${{ env.ARCH }} ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} ${{ env.GCC_64 }} ${{ env.GCC_32 }} ${{ env.KERNEL_CONFIG }}
         if [ ${{ env.ENABLE_CCACHE }} = true ]; then
@@ -199,17 +201,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: dtbo-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-        path: kernel_workspace/android-kernel/out/arch/${{ env.ARCH }}/boot/dtbo.img
-        
-    - name: Create Release and Upload to Release
-      if: env.CHECK_FILE_IS_OK == 'true'
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ env.RELEASE_TAG }} # Ensure this env variable is set to your desired tag name
-        name: Release ${{ env.RELEASE_TAG }}
-        body: Description of the release
-        files: kernel_workspace/AnyKernel3/*
-        draft: false
-        prerelease: false
+        path: kernel_workspace/android-kernel/out/arch/${{ env.ARCH }}/boot/dtbo.img        
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
