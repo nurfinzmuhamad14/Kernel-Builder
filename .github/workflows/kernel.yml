@@ -81,7 +81,7 @@ jobs:
     - name: Download kernel source
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
-        git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/burhancodes/BlackSapphireKSU.git -b 13 android-kernel --depth=1
+        git clone https://gitlab.com/MT6768Lab/KernelTree.git -b 13 android-kernel --depth=1
         if [[ ${{ env.ADD_LOCALVERSION_TO_FILENAME }} == 'true' ]]; then
           echo "LOCALVERSION=$(cat android-kernel/localversion)" >> $GITHUB_ENV
         else
@@ -98,6 +98,13 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
         if [ ${{ env.DISABLE-LTO }} = true ]; then
+            sed -i 's/^CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="-Noir"/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+            if grep -q CONFIG_KSU= arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}; then
+            sed -i 's/# CONFIG_KSU is not set/CONFIG_KSU=y/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+            sed -i 's/CONFIG_KSU=n/CONFIG_KSU=y/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+            else
+            echo "CONFIG_KSU=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+            fi
             sed -i 's/CONFIG_LTO=y/CONFIG_LTO=n/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
             sed -i 's/CONFIG_LTO_CLANG=y/CONFIG_LTO_CLANG=n/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
             sed -i 's/CONFIG_THINLTO=y/CONFIG_THINLTO=n/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
@@ -193,7 +200,7 @@ jobs:
       if: env.CHECK_FILE_IS_OK == 'true'
       uses: actions/upload-artifact@v4
       with:
-        name: BlackSapphire${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+        name: ${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
         path: kernel_workspace/AnyKernel3/*
 
     - name: Upload DTBO image
