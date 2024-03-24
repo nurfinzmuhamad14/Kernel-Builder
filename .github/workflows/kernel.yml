@@ -1,5 +1,9 @@
-name: Build Kernel
+name: Kernel Builder
+
 on:
+  schedule:
+    - cron: '30 18 * * 5'
+    
   watch:
     types: [started]
 
@@ -35,10 +39,10 @@ jobs:
         echo "ENABLE_CCACHE=$(cat $CONFIG_ENV | grep -w "ENABLE_CCACHE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "NEED_DTBO=$(cat $CONFIG_ENV | grep -w "NEED_DTBO" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
 
-    - name: Set swap to 20G
+    - name: Set swap to 24G
       uses: pierotofy/set-swap-space@master
       with:
-        swap-size-gb: 20
+        swap-size-gb: 24
 
     - name: Setup build kernel environment
       run: |
@@ -48,7 +52,7 @@ jobs:
         sudo apt-get install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3 zstd
         mkdir -p $GITHUB_WORKSPACE/kernel_workspace
 
-    - name: Download ZyC-Clang
+    - name: Fetch & Download latest ZyC-Clang
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
         mkdir clang-aosp
@@ -108,7 +112,7 @@ jobs:
       uses: hendrikmuhs/ccache-action@v1.2
       with:
         key: build-kernel-${{ env.DEVICE }}${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}
-        max-size: 8G
+        max-size: 12G
 
     - name: Build kernel
       run: |
