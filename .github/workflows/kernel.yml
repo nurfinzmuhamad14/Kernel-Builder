@@ -209,7 +209,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: https://api.github.com/repos/${{ github.repository }}/releases/${{ env.BUILD_TIME }}/assets{?name,label}
-        asset_path: $GITHUB_WORKSPACE/kernel_workspace/AnyKernel3/*
+        asset_path: /home/runner/work/Kernel-Builder/Kernel-Builder/kernel_workspace/AnyKernel3/*
         asset_name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
         asset_content_type: application/zip
         
