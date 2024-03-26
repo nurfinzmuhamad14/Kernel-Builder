@@ -210,23 +210,33 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-      path: ./noir
+        path: ./noir
 
     - name: Get Current Date
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
     - name: Create Release
+      id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.date.outputs.date }}
         release_name: ${{ steps.date.outputs.date }}
         draft: false
         prerelease: false
         body: "Release of ${env.LOCALVERSION}${env.UPLOADNAME}-${env.DEVICE} on ${{ steps.date.outputs.date }}"
-        upload_url: noir/*
+      
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./noir/Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}.zip
+        asset_name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}.zip
+        asset_content_type: application/zip
     
     - name: Upload DTBO image
       if: env.CHECK_DTBO_IS_OK == 'true'
