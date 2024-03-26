@@ -211,21 +211,18 @@ jobs:
         path: kernel_workspace/android-kernel/out/arch/${{ env.ARCH }}/boot/dtbo.img        
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  upload-to-release:
-     needs: build
-     runs-on: ubuntu-latest
-     steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+  
+    - name: Download Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
       
-      - name: Upload to GitHub Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: https://api.github.com/repos/${{ github.repository }}/releases/${{ env.BUILD_TIME }}/assets{?name,label}
-          asset_path: ./AnyKernel3${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-          asset_name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-          asset_content_type: application/zip
+    - name: Upload to GitHub Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: https://api.github.com/repos/${{ github.repository }}/releases/${{ env.BUILD_TIME }}/assets{?name,label}
+        asset_path: ./AnyKernel3${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+        asset_name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+        asset_content_type: application/zip
