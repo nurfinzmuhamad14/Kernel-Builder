@@ -209,7 +209,7 @@ jobs:
     - name: Download Artifact
       uses: actions/download-artifact@v3
       with:
-        name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+        name: Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}.zip
         path: ./noir
 
     - name: Get Current Date
