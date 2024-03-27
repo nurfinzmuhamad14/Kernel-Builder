@@ -2,7 +2,7 @@ name: Kernel Builder
 
 on:
   schedule:
-    - cron: '30 18 * * 5'
+    - cron: '50 7 * * *'
     
   watch:
     types: [started]
@@ -214,12 +214,4 @@ jobs:
       with:
         name: Black-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
         path: kernel_workspace/AnyKernel3/*
-        
-    - name:  Create GitHub Release => (${{ env.BUILD_TUME }})
-      continue-on-error: true
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ env.BUILD_TUME }}.${{ github.run_number }}
-        files: "$GITHUB_WORKSPACE/kernel_workspace/Black-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}"
-        generate_release_notes: true
-        
+         
