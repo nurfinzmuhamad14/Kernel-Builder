@@ -220,6 +220,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: v${{ env.BUILD_TUME }}.${{ github.run_number }}
-        files: "Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}.zip"
+        files: "$GITHUB_WORKSPACE/kernel_workspace/Noir-[ZyC]${{ env.LOCALVERSION }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}.zip"
         generate_release_notes: true
         
